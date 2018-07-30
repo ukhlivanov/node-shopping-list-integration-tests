@@ -1,7 +1,11 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 
-const { app, runServer, closeServer } = require("../server");
+const {
+  app,
+  runServer,
+  closeServer
+} = require("../server");
 
 // this lets us use *expect* style syntax in our tests
 // so we can do things like `expect(1 + 1).to.equal(2);`
@@ -66,7 +70,10 @@ describe("Shopping List", function() {
   //  2. inspect response object and prove it has right
   //  status code and that the returned object has an `id`
   it("should add an item on POST", function() {
-    const newItem = { name: "coffee", checked: false };
+    const newItem = {
+      name: "coffee",
+      checked: false
+    };
     return chai
       .request(app)
       .post("/shopping-list")
@@ -80,7 +87,9 @@ describe("Shopping List", function() {
         // response should be deep equal to `newItem` from above if we assign
         // `id` to it from `res.body.id`
         expect(res.body).to.deep.equal(
-          Object.assign(newItem, { id: res.body.id })
+          Object.assign(newItem, {
+            id: res.body.id
+          })
         );
       });
   });
@@ -104,29 +113,29 @@ describe("Shopping List", function() {
 
     return (
       chai
-        .request(app)
-        // first have to get so we have an idea of object to update
-        .get("/shopping-list")
-        .then(function(res) {
-          updateData.id = res.body[0].id;
-          // this will return a promise whose value will be the response
-          // object, which we can inspect in the next `then` block. Note
-          // that we could have used a nested callback here instead of
-          // returning a promise and chaining with `then`, but we find
-          // this approach cleaner and easier to read and reason about.
-          return chai
-            .request(app)
-            .put(`/shopping-list/${updateData.id}`)
-            .send(updateData);
-        })
-        // prove that the PUT request has right status code
-        // and returns updated item
-        .then(function(res) {
-          expect(res).to.have.status(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a("object");
-          expect(res.body).to.deep.equal(updateData);
-        })
+      .request(app)
+      // first have to get so we have an idea of object to update
+      .get("/shopping-list")
+      .then(function(res) {
+        updateData.id = res.body[0].id;
+        // this will return a promise whose value will be the response
+        // object, which we can inspect in the next `then` block. Note
+        // that we could have used a nested callback here instead of
+        // returning a promise and chaining with `then`, but we find
+        // this approach cleaner and easier to read and reason about.
+        return chai
+          .request(app)
+          .put(`/shopping-list/${updateData.id}`)
+          .send(updateData);
+      })
+      // prove that the PUT request has right status code
+      // and returns updated item
+      .then(function(res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a("object");
+        expect(res.body).to.deep.equal(updateData);
+      })
     );
   });
 
@@ -137,16 +146,16 @@ describe("Shopping List", function() {
   it("should delete items on DELETE", function() {
     return (
       chai
-        .request(app)
-        // first have to get so we have an `id` of item
-        // to delete
-        .get("/shopping-list")
-        .then(function(res) {
-          return chai.request(app).delete(`/shopping-list/${res.body[0].id}`);
-        })
-        .then(function(res) {
-          expect(res).to.have.status(204);
-        })
+      .request(app)
+      // first have to get so we have an `id` of item
+      // to delete
+      .get("/shopping-list")
+      .then(function(res) {
+        return chai.request(app).delete(`/shopping-list/${res.body[0].id}`);
+      })
+      .then(function(res) {
+        expect(res).to.have.status(204);
+      })
     );
   });
 });
