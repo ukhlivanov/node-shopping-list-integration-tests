@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { checkForRequiredFields } = require('./utilities')
 
 const { ShoppingList } = require("./models");
 
@@ -21,14 +22,9 @@ router.get("/", (req, res) => {
 // add new item to ShoppingList and return it with a 201.
 router.post("/", (req, res) => {
   // ensure `name` and `budget` are in request body
-  const requiredFields = ["name", "checked"];
-  for (let i = 0; i < requiredFields.length; i++) {
-    const field = requiredFields[i];
-    if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`;
-      console.error(message);
-      return res.status(400).send(message);
-    }
+  const result = checkForRequiredFields(req.body)
+  if (result !== null) {
+    return res.status(400).send(result);
   }
   const item = ShoppingList.create(req.body.name, req.body.checked);
   res.status(201).json(item);
@@ -60,7 +56,7 @@ router.put("/:id", (req, res) => {
   if (req.params.id !== req.body.id) {
     const message = `Request path id (${
       req.params.id
-    }) and request body id ``(${req.body.id}) must match`;
+      }) and request body id ``(${req.body.id}) must match`;
     console.error(message);
     return res.status(400).send(message);
   }
